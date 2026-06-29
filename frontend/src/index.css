@@ -1,0 +1,87 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Outfit', system-ui, -apple-system, sans-serif;
+  --color-gold: #d4af37;
+  --color-gold-hover: #b89327;
+  --color-navy: #0a0a0f;
+  --color-navy-dark: #050508;
+  --color-navy-light: #0f172a;
+  --color-glass-bg: rgba(15, 23, 42, 0.85);
+  --color-glass-border: rgba(255, 255, 255, 0.08);
+  --color-glass-border-hover: rgba(255, 255, 255, 0.18);
+}
+
+:root {
+  font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #0a0a0f;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(15, 23, 42, 0.9) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(30, 41, 59, 0.35) 0px, transparent 50%);
+  background-attachment: fixed;
+  color: #f8fafc;
+  overflow-x: hidden;
+}
+
+/* Premium card and panels */
+.glass-panel {
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.6);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-panel-hover:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.7);
+  transform: translateY(-1px);
+}
+
+/* Custom Scrollbar for bracket columns wrapper */
+.bracket-scroll-container::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+
+.bracket-scroll-container::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.6);
+  border-radius: 9999px;
+}
+
+.bracket-scroll-container::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 55, 0.25);
+  border-radius: 9999px;
+  border: 2px solid rgba(15, 23, 42, 0.6);
+}
+
+.bracket-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(212, 175, 55, 0.5);
+}
+
+/* Hide scrollbars but keep functionality */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Custom layout classes */
+.sticky-round-label {
+  position: sticky;
+  top: 0;
+  background: #0a0a0f;
+  z-index: 20;
+  padding: 8px 0;
+  border-bottom: 1.5px solid rgba(255, 255, 255, 0.04);
+}

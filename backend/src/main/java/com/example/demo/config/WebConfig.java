@@ -23,9 +23,18 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
+        String frontendUrl = System.getenv("FRONTEND_URL");
+        String[] allowedOrigins;
+        if (frontendUrl != null && !frontendUrl.trim().isEmpty()) {
+            allowedOrigins = new String[] { "http://localhost:5173", frontendUrl.trim() };
+        } else {
+            allowedOrigins = new String[] { "http://localhost:5173" };
+        }
+
         registry.addMapping("/**")
-                .allowedOrigins("*")
+                .allowedOrigins(allowedOrigins)
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
-                .allowedHeaders("*");
+                .allowedHeaders("*")
+                .allowCredentials(true);
     }
 }

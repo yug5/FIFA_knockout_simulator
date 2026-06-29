@@ -37,12 +37,12 @@ public class SeedingService {
         matchRepository.deleteAll();
         entityManager.createNativeQuery("ALTER TABLE match_record AUTO_INCREMENT = 1").executeUpdate();
 
-        // 32 Real World Cup teams
+        // 32 Real World Cup teams ordered exactly by the 433 bracket post
         String[] teams = {
-            "South Africa", "Canada", "Brazil", "Japan", "Germany", "Paraguay", "Netherlands", "Morocco",
-            "Côte d’Ivoire", "Norway", "France", "Sweden", "Mexico", "Ecuador", "England", "Congo - Kinshasa",
-            "Belgium", "Senegal", "United States", "Bosnia & Herzegovina", "Spain", "Austria", "Portugal", "Croatia",
-            "Switzerland", "Algeria", "Australia", "Egypt", "Argentina", "Cape Verde", "Colombia", "Ghana"
+            "Germany", "Paraguay", "France", "Sweden", "South Africa", "Canada", "Netherlands", "Morocco",
+            "Portugal", "Croatia", "Spain", "Austria", "United States", "Bosnia & Herzegovina", "Belgium", "Senegal",
+            "Brazil", "Japan", "Côte d’Ivoire", "Norway", "Mexico", "Ecuador", "England", "Congo - Kinshasa",
+            "Argentina", "Cape Verde", "Australia", "Egypt", "Switzerland", "Algeria", "Colombia", "Ghana"
         };
 
         // 1. ROUND OF 32 (16 matches)

@@ -89,6 +89,7 @@ export default function Bracket({
         readOnly={readOnly}
         popularity1={p1}
         popularity2={p2}
+        getTeamFlag={getTeamFlagForName}
       />
     );
   };

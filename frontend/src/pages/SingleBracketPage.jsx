@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import { ShieldAlert, Share2, Award, Clipboard } from 'lucide-react';
+import { ShieldAlert, Share2, Award, Clipboard, Maximize2, Minimize2 } from 'lucide-react';
 import Bracket from '../components/Bracket';
 import { getPredictionByName, getLeaderboard } from '../api/endpoints';
 
@@ -10,6 +10,7 @@ export default function SingleBracketPage() {
   const { name } = useParams();
   const [copied, setCopied] = useState(false);
   const [zoomScale, setZoomScale] = useState(0.7);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   // Query participant predictions
   const { data: bracketData, isLoading: bracketLoading, isError: bracketError } = useQuery({
@@ -176,7 +177,7 @@ export default function SingleBracketPage() {
         )}
       </div>
 
-      {/* Zoom Controls */}
+      {/* Zoom & Fullscreen Controls */}
       <div className="hidden xl:flex justify-center items-center gap-2 mb-6">
         <span className="text-[10px] uppercase font-bold text-gray-500 tracking-wider">Zoom View:</span>
         {[
@@ -196,15 +197,79 @@ export default function SingleBracketPage() {
             {opt.label}
           </button>
         ))}
+
+        <button
+          onClick={() => setIsFullscreen(!isFullscreen)}
+          className="ml-4 px-3 py-1 rounded-lg text-xs font-black transition-all bg-navy-light/40 border border-glass-border/30 text-gray-400 hover:text-white hover:border-white/20 flex items-center gap-1.5"
+          title="Toggle Fullscreen Bracket"
+        >
+          <Maximize2 className="w-3.5 h-3.5" /> Fullscreen Mode
+        </button>
       </div>
 
-      <Bracket
-        predictions={predictionsDict}
-        initialMatches={matches}
-        onSelectTeam={null}
-        readOnly={true}
-        zoomScale={zoomScale}
-      />
+      {isFullscreen ? (
+        <div className="fixed inset-0 bg-[#050814] z-50 flex flex-col p-6 overflow-auto animate-fade-in">
+          {/* Fullscreen Header Controls */}
+          <div className="flex justify-between items-center mb-6 pb-4 border-b border-glass-border/30">
+            <div className="flex items-center gap-4">
+              <h2 className="text-sm font-extrabold text-white uppercase tracking-wider">{name}'s Predictions</h2>
+              <span className="text-[10px] bg-white/5 px-2.5 py-1 rounded border border-glass-border font-bold text-slate-400">
+                Correct: {correctCount} / 31 ({totalScore} pts)
+              </span>
+            </div>
+            
+            <div className="flex items-center gap-4">
+              {/* Fullscreen Zoom Controls */}
+              <div className="flex items-center gap-1.5">
+                <span className="text-[9px] uppercase font-bold text-gray-500 tracking-wider mr-1">Zoom:</span>
+                {[
+                  { label: '55%', value: 0.55 },
+                  { label: '70% (Fit)', value: 0.7 },
+                  { label: '85%', value: 0.85 },
+                  { label: '100%', value: 1.0 },
+                ].map((opt) => (
+                  <button
+                    key={opt.value}
+                    onClick={() => setZoomScale(opt.value)}
+                    className={`px-2.5 py-0.5 rounded text-[10px] font-black transition-all ${
+                      zoomScale === opt.value
+                        ? 'bg-white/10 text-white border border-white/20'
+                        : 'bg-navy-light/40 border border-glass-border/30 text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                onClick={() => setIsFullscreen(false)}
+                className="bg-red-950/40 border border-red-500/25 hover:bg-red-500 hover:text-white text-red-400 text-[10px] font-bold px-3 py-1.5 rounded-lg flex items-center gap-1"
+              >
+                <Minimize2 className="w-3 h-3" /> Exit Fullscreen
+              </button>
+            </div>
+          </div>
+
+          <div className="flex-grow flex justify-center items-start overflow-auto">
+            <Bracket
+              predictions={predictionsDict}
+              initialMatches={matches}
+              onSelectTeam={null}
+              readOnly={true}
+              zoomScale={zoomScale}
+            />
+          </div>
+        </div>
+      ) : (
+        <Bracket
+          predictions={predictionsDict}
+          initialMatches={matches}
+          onSelectTeam={null}
+          readOnly={true}
+          zoomScale={zoomScale}
+        />
+      )}
     </div>
   );
 }

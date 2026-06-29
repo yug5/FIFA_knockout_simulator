@@ -48,6 +48,7 @@ export default function MatchCard({
   readOnly = false,
   popularity1 = null,
   popularity2 = null,
+  getTeamFlag = null,
 }) {
   const { id, team1, team2, actualWinner } = match;
 
@@ -130,8 +131,8 @@ export default function MatchCard({
               : 'bg-slate-900/40 text-slate-600 border border-slate-800/40 font-mono'
           }`}>
             {!team ? '?' : (() => {
-              const customFlag = isTeam2 ? match.flag2 : match.flag1;
-              if (customFlag && !isDull) {
+              const customFlag = getTeamFlag ? getTeamFlag(team) : null;
+              if (customFlag) {
                 if (customFlag.startsWith('http://') || customFlag.startsWith('https://') || customFlag.startsWith('/')) {
                   return <img src={customFlag} alt="" className="w-full h-full object-cover" />;
                 }

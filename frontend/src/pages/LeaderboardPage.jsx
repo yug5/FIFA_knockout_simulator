@@ -53,7 +53,7 @@ export default function LeaderboardPage() {
           <ShieldAlert className="w-12 h-12 text-slate-500 mx-auto mb-4" />
           <h2 className="text-lg font-extrabold mb-2">Connection Failure</h2>
           <p className="text-xs text-slate-400">
-            Failed to query standings from the server. Check port 8081 status.
+            Failed to query standings from the server. Check backend API status.
           </p>
         </div>
       </div>

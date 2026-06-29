@@ -65,7 +65,7 @@ export default function PredictionsPage() {
           <ShieldAlert className="w-12 h-12 text-slate-500 mx-auto mb-4" />
           <h2 className="text-lg font-extrabold mb-2">Connection Error</h2>
           <p className="text-xs text-slate-400">
-            Failed to query public predictions from the database. Make sure port 8081 is active.
+            Failed to query public predictions from the database. Check backend API status.
           </p>
         </div>
       </div>

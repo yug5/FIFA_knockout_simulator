@@ -221,7 +221,7 @@ export default function BracketPage() {
           <ShieldAlert className="w-12 h-12 text-red-500 mx-auto mb-4" />
           <h2 className="text-lg font-extrabold mb-2">Connection Unreachable</h2>
           <p className="text-xs text-slate-400">
-            We are unable to connect to the backend server. Please verify the Spring Boot service is active on port 8081.
+            We are unable to connect to the backend server. Please verify the Spring Boot service is active and running.
           </p>
         </div>
       </div>

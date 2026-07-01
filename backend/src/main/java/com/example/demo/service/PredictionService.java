@@ -68,6 +68,7 @@ public class PredictionService {
         Map<Round, Long> matchesCountPerRound = allMatches.stream()
                 .collect(Collectors.groupingBy(Match::getRound, Collectors.counting()));
         Map<Round, Integer> correctPicksPerRound = new HashMap<>();
+        Map<Round, Integer> userChoicesCountPerRound = new HashMap<>();
 
         for (PredictionItemDto item : request.getPredictions()) {
             Match match = matchMap.get(item.getMatchId());
@@ -77,13 +78,19 @@ public class PredictionService {
 
             Prediction prediction = new Prediction(savedParticipant, match, item.getPredictedTeam().trim());
             
-            // Check correctness immediately if actual winner is already entered
+            boolean isUserChoice = true;
             String actualWinner = match.getActualWinner();
             if (actualWinner != null) {
                 boolean isCorrect = prediction.getPredictedTeam().equalsIgnoreCase(actualWinner);
                 prediction.setIsCorrect(isCorrect);
 
-                if (isCorrect) {
+                if (match.getDecidedAt() == null) {
+                    isUserChoice = false;
+                } else if (savedParticipant.getSubmittedAt() != null && match.getDecidedAt().toLocalDateTime().isBefore(savedParticipant.getSubmittedAt())) {
+                    isUserChoice = false;
+                }
+
+                if (isUserChoice && isCorrect) {
                     Round round = match.getRound();
                     correctPicksPerRound.put(round, correctPicksPerRound.getOrDefault(round, 0) + 1);
                     initialScore += round.getPoints();
@@ -92,20 +99,24 @@ public class PredictionService {
                 prediction.setIsCorrect(null);
             }
 
+            if (isUserChoice) {
+                Round round = match.getRound();
+                userChoicesCountPerRound.put(round, userChoicesCountPerRound.getOrDefault(round, 0) + 1);
+            }
+
             predictionsToSave.add(prediction);
         }
 
         predictionRepository.saveAll(predictionsToSave);
 
-        // Apply perfect round bonuses to initial score if relevant
+        // Apply perfect round bonuses to initial score if relevant (Option A: +1 point stage bonus)
         for (Map.Entry<Round, Integer> entry : correctPicksPerRound.entrySet()) {
             Round round = entry.getKey();
             int correctCount = entry.getValue();
-            long totalInRound = matchesCountPerRound.getOrDefault(round, 0L);
+            int userChoicesInRound = userChoicesCountPerRound.getOrDefault(round, 0);
 
-            if (correctCount == totalInRound && totalInRound > 0) {
-                double bonus = totalInRound * round.getPoints() * 0.5;
-                initialScore += (int) bonus;
+            if (userChoicesInRound > 0 && correctCount == userChoicesInRound) {
+                initialScore += 1;
             }
         }
 
@@ -129,6 +140,7 @@ public class PredictionService {
                 participant.getName(),
                 participant.getSubmittedAt(),
                 participant.getTotalScore(),
+                participant.getBonusPoints(),
                 details
         );
     }

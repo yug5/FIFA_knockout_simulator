@@ -55,3 +55,8 @@ export const updateMatchTeams = async (id, payload) => {
   return response.data;
 };
 
+export const adjustParticipantPoints = async (id, points) => {
+  const response = await client.put(`/admin/participants/${id}/points`, { points });
+  return response.data;
+};
+

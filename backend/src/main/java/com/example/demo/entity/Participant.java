@@ -20,12 +20,16 @@ public class Participant {
     @Column(name = "total_score", nullable = false)
     private Integer totalScore = 0;
 
+    @Column(name = "bonus_points", nullable = false)
+    private Integer bonusPoints = 0;
+
     public Participant() {}
 
     public Participant(String name, LocalDateTime submittedAt) {
         this.name = name;
         this.submittedAt = submittedAt;
         this.totalScore = 0;
+        this.bonusPoints = 0;
     }
 
     // Getters and Setters
@@ -59,5 +63,13 @@ public class Participant {
 
     public void setTotalScore(Integer totalScore) {
         this.totalScore = totalScore;
+    }
+
+    public Integer getBonusPoints() {
+        return bonusPoints;
+    }
+
+    public void setBonusPoints(Integer bonusPoints) {
+        this.bonusPoints = bonusPoints;
     }
 }

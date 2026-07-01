@@ -1,8 +1,11 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.MatchDto;
+import com.example.demo.dto.ParticipantDto;
 import com.example.demo.entity.Match;
+import com.example.demo.entity.Participant;
 import com.example.demo.repository.MatchRepository;
+import com.example.demo.repository.ParticipantRepository;
 import com.example.demo.service.ScoringService;
 import com.example.demo.service.SeedingService;
 import org.springframework.http.HttpStatus;
@@ -22,13 +25,16 @@ public class AdminController {
     private final SeedingService seedingService;
     private final ScoringService scoringService;
     private final MatchRepository matchRepository;
+    private final ParticipantRepository participantRepository;
 
     public AdminController(SeedingService seedingService,
                            ScoringService scoringService,
-                           MatchRepository matchRepository) {
+                           MatchRepository matchRepository,
+                           ParticipantRepository participantRepository) {
         this.seedingService = seedingService;
         this.scoringService = scoringService;
         this.matchRepository = matchRepository;
+        this.participantRepository = participantRepository;
     }
 
     public static class ResultRequest {
@@ -113,6 +119,27 @@ public class AdminController {
         scoringService.recalculateScores(id);
 
         return ResponseEntity.ok(new MatchDto(savedMatch));
+    }
+
+    // PUT /api/admin/participants/{id}/points (adjust points for a participant)
+    @PutMapping("/participants/{id}/points")
+    public ResponseEntity<ParticipantDto> adjustPoints(@PathVariable Long id, @RequestBody Map<String, Integer> body) {
+        Participant participant = participantRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Participant not found: " + id));
+
+        Integer points = body.get("points");
+        if (points == null) {
+            throw new IllegalArgumentException("Points value is required");
+        }
+
+        int currentBonus = participant.getBonusPoints() != null ? participant.getBonusPoints() : 0;
+        participant.setBonusPoints(currentBonus + points);
+
+        // Recalculate their total score
+        scoringService.recalculateParticipantScore(participant);
+
+        Participant savedParticipant = participantRepository.save(participant);
+        return ResponseEntity.ok(new ParticipantDto(savedParticipant));
     }
 
     // PUT /api/admin/matches/{id}/teams (edit team names and flags)

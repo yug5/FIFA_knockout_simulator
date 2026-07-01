@@ -7,14 +7,16 @@ public class ParticipantPredictionsResponse {
     private String name;
     private LocalDateTime submittedAt;
     private Integer totalScore;
+    private Integer bonusPoints;
     private List<PredictionDetailDto> predictions;
 
     public ParticipantPredictionsResponse() {}
 
-    public ParticipantPredictionsResponse(String name, LocalDateTime submittedAt, Integer totalScore, List<PredictionDetailDto> predictions) {
+    public ParticipantPredictionsResponse(String name, LocalDateTime submittedAt, Integer totalScore, Integer bonusPoints, List<PredictionDetailDto> predictions) {
         this.name = name;
         this.submittedAt = submittedAt;
         this.totalScore = totalScore;
+        this.bonusPoints = bonusPoints;
         this.predictions = predictions;
     }
 
@@ -41,6 +43,14 @@ public class ParticipantPredictionsResponse {
 
     public void setTotalScore(Integer totalScore) {
         this.totalScore = totalScore;
+    }
+
+    public Integer getBonusPoints() {
+        return bonusPoints;
+    }
+
+    public void setBonusPoints(Integer bonusPoints) {
+        this.bonusPoints = bonusPoints;
     }
 
     public List<PredictionDetailDto> getPredictions() {

@@ -8,6 +8,7 @@ public class ParticipantDto {
     private String name;
     private LocalDateTime submittedAt;
     private Integer totalScore;
+    private Integer bonusPoints;
 
     public ParticipantDto() {}
 
@@ -16,6 +17,7 @@ public class ParticipantDto {
         this.name = p.getName();
         this.submittedAt = p.getSubmittedAt();
         this.totalScore = p.getTotalScore();
+        this.bonusPoints = p.getBonusPoints();
     }
 
     // Getters and Setters
@@ -49,5 +51,13 @@ public class ParticipantDto {
 
     public void setTotalScore(Integer totalScore) {
         this.totalScore = totalScore;
+    }
+
+    public Integer getBonusPoints() {
+        return bonusPoints;
+    }
+
+    public void setBonusPoints(Integer bonusPoints) {
+        this.bonusPoints = bonusPoints;
     }
 }

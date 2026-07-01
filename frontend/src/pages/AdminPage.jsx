@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import { Lock, ShieldAlert, Check, X, Database, Edit2 } from 'lucide-react';
-import { getAdminMatches, setMatchResult, seedMatches, getAllPredictions, updateMatchTeams } from '../api/endpoints';
+import { Lock, ShieldAlert, Check, X, Database, Edit2, Plus, Minus, Award } from 'lucide-react';
+import { getAdminMatches, setMatchResult, seedMatches, getAllPredictions, updateMatchTeams, adjustParticipantPoints } from '../api/endpoints';
 
 export default function AdminPage() {
   const queryClient = useQueryClient();
@@ -14,6 +14,9 @@ export default function AdminPage() {
   const [selectedMatch, setSelectedMatch] = useState(null);
   const [selectedWinner, setSelectedWinner] = useState('');
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+
+  // Player points adjustment state
+  const [adjustments, setAdjustments] = useState({});
 
   // Edit teams modal states
   const [editingMatch, setEditingMatch] = useState(null);
@@ -135,6 +138,24 @@ export default function AdminPage() {
       toast.error(err.response?.data?.error || err.message || 'Failed to update teams');
     }
   });
+
+  // Adjust points mutation
+  const adjustPointsMutation = useMutation({
+    mutationFn: ({ id, points }) => adjustParticipantPoints(id, points),
+    onSuccess: () => {
+      toast.success('Player points adjusted successfully');
+      refetchParticipants();
+      queryClient.invalidateQueries(['leaderboard']);
+    },
+    onError: (err) => {
+      toast.error(err.response?.data?.error || err.message || 'Failed to adjust points');
+    }
+  });
+
+  const handleAdjustPoints = (id, points) => {
+    if (!points) return;
+    adjustPointsMutation.mutate({ id, points });
+  };
 
   const triggerConfirmResult = (match, winner) => {
     setSelectedMatch(match);
@@ -279,6 +300,74 @@ export default function AdminPage() {
             <Database className="w-3.5 h-3.5" /> Reset Database
           </button>
         </div>
+      </div>
+
+      {/* Player Points Management */}
+      <div className="glass-panel p-6 rounded-2xl border border-glass-border mb-8">
+        <h3 className="text-white font-extrabold uppercase tracking-widest text-xs border-b border-glass-border/30 pb-2 mb-4 flex items-center gap-2">
+          <Award className="w-4 h-4 text-amber-400" /> Manage Player Standings / Points
+        </h3>
+        
+        {participants.length === 0 ? (
+          <div className="text-center py-6 text-slate-500 text-xs font-bold">No participants found.</div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr className="border-b border-glass-border/30 bg-navy-light/20 text-gray-400 font-extrabold uppercase tracking-wider">
+                  <th className="p-3 pl-4">Player</th>
+                  <th className="p-3 text-center">Prediction Score</th>
+                  <th className="p-3 text-center">Admin Offset</th>
+                  <th className="p-3 text-center">Total Points</th>
+                  <th className="p-3 pr-4 text-right">Adjust Points</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-glass-border/10 font-bold">
+                {participants.map((p) => {
+                  const bonus = p.bonusPoints || 0;
+                  const baseScore = p.totalScore - bonus;
+                  const amt = adjustments[p.id] || 1;
+                  return (
+                    <tr key={p.id} className="hover:bg-white/5 transition-all">
+                      <td className="p-3 pl-4 text-white font-extrabold">{p.name}</td>
+                      <td className="p-3 text-center text-slate-400">{baseScore} pts</td>
+                      <td className={`p-3 text-center ${bonus > 0 ? 'text-green-400' : bonus < 0 ? 'text-red-400' : 'text-slate-500'}`}>
+                        {bonus > 0 ? `+${bonus}` : bonus}
+                      </td>
+                      <td className="p-3 text-center text-gold font-black">{p.totalScore} pts</td>
+                      <td className="p-3 pr-4 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <input
+                            type="number"
+                            value={amt}
+                            onChange={(e) => setAdjustments({ ...adjustments, [p.id]: parseInt(e.target.value) || 0 })}
+                            className="w-12 bg-navy-dark border border-glass-border rounded-lg py-1 px-2 text-white text-center text-xs outline-none focus:border-white/20"
+                          />
+                          <button
+                            disabled={adjustPointsMutation.isPending}
+                            onClick={() => handleAdjustPoints(p.id, amt)}
+                            className="bg-green-500/20 hover:bg-green-500/35 border border-green-500/35 text-green-400 font-black px-3 py-1.5 rounded-lg text-[10px] transition-all flex items-center gap-0.5"
+                            title="Add Points"
+                          >
+                            <Plus className="w-3.5 h-3.5" /> Add
+                          </button>
+                          <button
+                            disabled={adjustPointsMutation.isPending}
+                            onClick={() => handleAdjustPoints(p.id, -amt)}
+                            className="bg-red-500/20 hover:bg-red-500/35 border border-red-500/35 text-red-400 font-black px-3 py-1.5 rounded-lg text-[10px] transition-all flex items-center gap-0.5"
+                            title="Remove Points"
+                          >
+                            <Minus className="w-3.5 h-3.5" /> Remove
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       {/* Matches Listing grouped by Round */}
